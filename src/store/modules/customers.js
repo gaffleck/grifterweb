@@ -21,15 +21,9 @@ const actions = {
       console.log(data);
       axios({
         method: "post",
-        url: "https://grifter.azurewebsites.net/api/Customers",
+        url: "https://grifter2.herokuapp.com/api/customers/",
         data: data,
-        headers: {
-          Authorization:
-            "Basic " +
-            btoa(
-              "" + ":" + "4oxx6jennjnvlu5svv3ieqyf6bg6non7qmr6usculxq5psbwjoiq"
-            )
-        }
+        headers: {}
       })
         .then(response => {
           resolve(response);
@@ -67,17 +61,7 @@ const actions = {
   getAllCustomers({ commit }) {
     return new Promise((resolve, reject) => {
       // axios
-      //   .get("https://grifter.azurewebsites.net/api/Customers", {
-      //     headers: {
-      //       Authorization:
-      //         "Basic " +
-      //         btoa(
-      //           "" +
-      //             ":" +
-      //             "4oxx6jennjnvlu5svv3ieqyf6bg6non7qmr6usculxq5psbwjoiq"
-      //         )
-      //     }
-      //   })
+      //   .get("https://grifter2.herokuapp.com/api/customers/")
       //   .then(response => {
       //     commit("setCustomers", response.data);
       //     resolve(response);

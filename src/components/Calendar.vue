@@ -8,6 +8,9 @@
         </div>
         <div class="week" v-for="w in month.weeksInMonth" v-bind:key="w">
           <div class="day" v-for="d in 7" v-bind:key="d">
+            <div class="day-addEvent" v-on:click="addEvent(m,dayOfMonth(month,w,d))">
+              <font-awesome-icon icon="plus"/>
+            </div>
             <span class="date">{{ showDate(month,d,w) ? dayOfMonth(month,w,d) : ''}}</span>
             <div class="events">
               <div
@@ -30,7 +33,8 @@ export default {
   components: {},
   props: {
     friends: Array,
-    loadFriend: Function
+    loadFriend: Function,
+    addEvent: Function
   },
   mounted() {
     for (let i = 0; i < 12; i++) {
@@ -153,6 +157,8 @@ h2 {
   .date {
     grid-area: date;
     justify-self: center;
+    pointer-events: none;
+    user-select: none;
   }
   .events {
     grid-area: events;
@@ -169,6 +175,24 @@ h2 {
     display: inline-flex;
     justify-content: center;
     align-items: center;
+  }
+}
+
+.day-addEvent {
+  grid-row: 1 / span 3;
+  grid-column: 1 / 1;
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+  color: $primary;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+
+  .day:hover & {
+    opacity: 1;
   }
 }
 </style>

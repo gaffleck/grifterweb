@@ -45,7 +45,7 @@ export default {
       this.showFriends = !this.showFriends;
     },
     addFriend: function() {
-      this.$store.dispatch("friends/toggleCreateFriend");
+      this.$store.dispatch("friends/toggleCreateFriend", null);
     },
     loadCustomer: function() {
       let id = this.customer.customerId;

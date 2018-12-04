@@ -1,5 +1,5 @@
 <template>
-  <Modal v-bind:close="dismissModal" v-bind:show="creatingFriend">
+  <Modal v-bind:close="dismissModal" v-bind:show="creatingFriend.value">
     <div v-if="!success && !error">
       <h1>Add a Friend</h1>
       <fieldset class="m-t-4" :disabled="processing">
@@ -65,8 +65,13 @@ export default {
   data: function() {
     return initialState();
   },
+  mounted() {
+    console.log(this.creatingFriend.targetDate);
+    this.fields.birthday = this.creatingFriend.targetDate;
+  },
   computed: {
     creatingFriend() {
+      this.fields.birthday = this.$store.state.friends.creatingFriend.targetDate;
       return this.$store.state.friends.creatingFriend;
     }
   },
@@ -84,7 +89,7 @@ export default {
       this.resetData();
     },
     dismissModal: function() {
-      this.$store.dispatch("friends/toggleCreateFriend");
+      this.$store.dispatch("friends/toggleCreateFriend", null);
       this.resetData();
     },
     validateForm: function() {

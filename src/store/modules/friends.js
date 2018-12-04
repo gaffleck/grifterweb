@@ -1,5 +1,8 @@
 const state = {
-  creatingFriend: false,
+  creatingFriend: {
+    value: false,
+    targetDate: null
+  },
   friends: [
     {
       firstName: "Liam",
@@ -41,16 +44,17 @@ const actions = {
   //     //GO GET FROM THE SERVER
   //   });
   // },
-  toggleCreateFriend({ commit, state }) {
-    let value = !state.creatingFriend;
-    commit("setCreateFriend", value);
+  toggleCreateFriend({ commit, state }, targetDate) {
+    let value = !state.creatingFriend.value;
+    commit("setCreateFriend", { value, targetDate });
   }
 };
 
 // mutations
 const mutations = {
-  setCreateFriend(state, value) {
-    return (state.creatingFriend = value);
+  setCreateFriend(state, update) {
+    state.creatingFriend.value = update.value;
+    state.creatingFriend.targetDate = update.targetDate;
   }
 };
 

@@ -32,7 +32,11 @@
               />
             </ul>
           </div>
-          <Calendar v-bind:friends="customer.friends" v-bind:loadFriend="loadFriend"/>
+          <Calendar
+            v-bind:friends="customer.friends"
+            v-bind:loadFriend="loadFriend"
+            v-bind:addEvent="addEvent"
+          />
         </div>
       </div>
     </div>
@@ -63,7 +67,7 @@ export default {
   },
   methods: {
     addFriend: function() {
-      this.$store.dispatch("friends/toggleCreateFriend");
+      this.$store.dispatch("friends/toggleCreateFriend", null);
     },
     loadFriend: function(friend) {
       let customerid = this.customer.customerId;
@@ -72,6 +76,11 @@ export default {
     },
     showFriends: function(val) {
       this.showFriendList = val;
+    },
+    addEvent: function(month, day) {
+      let thisYear = new Date().getFullYear();
+      let targetDate = new Date(thisYear, month, day);
+      this.$store.dispatch("friends/toggleCreateFriend", targetDate);
     }
   },
   data: function() {
@@ -84,7 +93,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .customer-view {
   max-width: 800px;
   margin: 0 auto;
@@ -93,6 +102,7 @@ export default {
 .customer-inner {
   display: grid;
   grid-template-columns: 1fr auto;
+  margin-bottom: spacing(4);
 }
 
 .friends-views {

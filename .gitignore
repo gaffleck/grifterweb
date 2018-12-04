@@ -62,3 +62,6 @@ typings/
 
 #dist directory for prod builds
 dist
+
+#vs code files
+.vscode

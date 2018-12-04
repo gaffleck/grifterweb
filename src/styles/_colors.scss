@@ -1,0 +1,29 @@
+$primary: #b721ff;
+$secondary: #21d4fd;
+
+$gradient: linear-gradient(19deg, $secondary 0%, $primary 100%);
+
+.h-color-primary {
+  color: $primary;
+}
+
+.h-color-white {
+  color: white;
+}
+
+@mixin preshadow {
+  position: relative;
+
+  &:before {
+    content: "";
+    position: absolute;
+    background-color: white;
+    top: 10px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    box-shadow: 0 24px 30px 0 rgba(185, 91, 243, 0.25),
+      0 24px 30px 0 rgba(0, 0, 0, 0.5);
+    z-index: -1;
+  }
+}

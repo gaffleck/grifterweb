@@ -15,7 +15,7 @@
     <ul class="friends" v-if="customer.friends && showFriends">
       <Friend
         v-for="friend in customer.friends"
-        v-bind:key="friend.customerId"
+        v-bind:key="friend.id"
         v-bind:friend="friend"
         v-on:click.native="loadFriend(friend, $event)"
       />
@@ -62,7 +62,7 @@ export default {
     },
     loadFriend: function(friend, e) {
       e.stopPropagation();
-      let friendid = friend.friendID;
+      let friendid = friend.id;
       this.$router.push({ name: "friend", params: { friendid } });
     }
   }

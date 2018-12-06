@@ -1,0 +1,17 @@
+.view-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.view-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  margin-bottom: spacing(4);
+}
+
+.view-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: spacing(4);
+  align-items: start;
+}

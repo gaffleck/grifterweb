@@ -1,10 +1,10 @@
 <template>
   <PoseTransition>
-    <Shade class="modal-frame" v-if="show">
-      <ModalBody class="modal-body">
+    <Shade class="modal-frame" v-if="show" v-on:click.native="close">
+      <ModalBody class="modal-body" v-on:click.native.stop="go($event)">
         <slot></slot>
       </ModalBody>
-      <div class="modal-close" v-on:click="close">
+      <div class="modal-close" v-on:click.native="close">
         <font-awesome-icon icon="times"/>
       </div>
     </Shade>
@@ -38,6 +38,11 @@ export default {
       enter: { y: 0, opacity: 1 },
       exit: { y: 200, opacity: 0 }
     })
+  },
+  methods: {
+    go: function(e) {
+      e.stopPropagation();
+    }
   }
 };
 </script>

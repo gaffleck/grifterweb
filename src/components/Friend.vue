@@ -1,6 +1,6 @@
 <template>
   <li class="friend">
-    <h2 class="name">{{ friend.firstName }} {{ friend.lastName }}</h2>
+    <h2 class="name">{{ fullName }}</h2>
     <div class="bday">
       <span class="m-r-1">🎉</span>
       {{ this.$dayjs(friend.birthDay).format('D MMM') }}
@@ -19,6 +19,11 @@ export default {
   name: "Friend",
   props: {
     friend: Object
+  },
+  computed: {
+    fullName() {
+      return this.friend.first_name + " " + this.friend.last_name;
+    }
   },
   methods: {
     formatMoney: function(val) {

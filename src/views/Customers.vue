@@ -38,11 +38,7 @@ export default {
         this.error = error;
       });
   },
-  methods: {
-    addFriend: function() {
-      this.$store.dispatch("friends/toggleCreateFriend");
-    }
-  },
+  methods: {},
   data: function() {
     return {
       error: null

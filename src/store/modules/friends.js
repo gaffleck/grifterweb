@@ -1,60 +1,46 @@
+import ApiService from "@/services/api.service";
+
 const state = {
   creatingFriend: {
     value: false,
-    targetDate: null
+    targetDate: null,
+    customerid: null
   },
-  friends: [
-    {
-      firstName: "Liam",
-      lastName: "Levesque",
-      birthDay: "10/22/83",
-      giftBudget: 1000,
-      giftHistory: [
-        {
-          name: "Power Ranger Action Figure",
-          cost: 500,
-          date: "10/22/2017"
-        },
-        {
-          name: "Power Ranger Action Figure",
-          cost: 500,
-          date: "10/22/2017"
-        }
-      ]
-    }
-  ]
+  currentFriend: null
 };
 
 // getters
-const getters = {
-  //   name: (state, getters) => {
-  //     return getters.cartProducts.reduce((total, product) => {
-  //       return total + product.price * product.quantity;
-  //     }, 0);
-  //   }
-};
+const getters = {};
 
 // actions
 const actions = {
-  // getAFriend({ commit, state }, { customerid, friendid }) {
-  //   return new Promise((resolve, reject) => {
-
-  //     if (state.customers[id]) resolve(state.friends[id]);
-  //     else reject("FAIL FOOL");
-  //     //GO GET FROM THE SERVER
-  //   });
-  // },
-  toggleCreateFriend({ commit, state }, targetDate) {
+  async getAFriend({ commit, state }, { friendid }) {
+    try {
+      const friend = await ApiService.get("friends/" + friendid);
+      commit("setCurrentFriend", friend.data);
+      return true;
+    } catch (e) {
+      console.log(e.message);
+      return false;
+    }
+  },
+  toggleCreateFriend({ commit, state }, { ...args }) {
     let value = !state.creatingFriend.value;
-    commit("setCreateFriend", { value, targetDate });
+    commit("setCreateFriend", {
+      value,
+      targetDate: args.targetDate || null,
+      customerid: args.customerid || null
+    });
   }
 };
 
 // mutations
 const mutations = {
   setCreateFriend(state, update) {
-    state.creatingFriend.value = update.value;
-    state.creatingFriend.targetDate = update.targetDate;
+    Object.assign(state.creatingFriend, update);
+  },
+  setCurrentFriend(state, value) {
+    return (state.currentFriend = value);
   }
 };
 

@@ -5,8 +5,11 @@
     <div v-if="!success && !error">
       <h1>Sign Up</h1>
       <fieldset class="m-t-4" :disabled="processing">
-        <InputItem :label="'Username'" :error="validation.userName">
-          <input type="text" v-model="user.userName" placeholder="eg. johnsmith" name="username">
+        <InputItem :label="'First Name'" :error="validation.first_name">
+          <input type="text" v-model="user.first_name" placeholder="eg. John" name="first_name">
+        </InputItem>
+        <InputItem :label="'Last Name'" :error="validation.last_name">
+          <input type="text" v-model="user.last_name" placeholder="eg. Smith" name="last_name">
         </InputItem>
         <InputItem :label="'E-mail Address'" :error="validation.email">
           <input
@@ -20,9 +23,9 @@
       </fieldset>
     </div>
     <div class="error" v-if="error"></div>
-    <div class="success" v-if="success">
+    <div class="text-align-center" v-if="success">
       <div class="text-large">🎉</div>
-      <h2>{{firstName}} {{lastName}} Added Successfully!</h2>
+      <h2>Added Successfully!</h2>
       <Button class="stretch m-t-4" v-on:click.native="dismissModal">Done</Button>
     </div>
   </Modal>
@@ -39,11 +42,13 @@ function initialState() {
     success: false,
     processing: false,
     user: {
-      userName: null,
+      first_name: null,
+      last_name: null,
       email: null
     },
     validation: {
-      userName: null,
+      first_name: null,
+      last_name: null,
       email: null
     }
   };
@@ -67,17 +72,15 @@ export default {
   methods: {
     signup: function() {
       if (!this.validateForm()) return;
+      console.log("create", this.user);
       this.processing = true;
-      this.$store
-        .dispatch("customers/signUp", this.user)
-        .then(res => {
-          this.processing = false;
-          this.success = true;
-        })
-        .catch(error => {
-          this.processing = false;
-          this.error = error;
-        });
+      if (this.$store.dispatch("customers/signUp", this.user)) {
+        this.processing = false;
+        this.success = true;
+      } else {
+        this.processing = false;
+        this.error = "THERE WAS AN ERROR";
+      }
     },
     addNew: function() {
       this.resetForm();
@@ -88,10 +91,15 @@ export default {
     },
     validateForm: function() {
       let validationPassed = true;
-      if (!this.user.userName) {
-        this.validation.userName = "Please provide a username!";
+      if (!this.user.first_name) {
+        this.validation.first_name = "Please provide a first name!";
         validationPassed = false;
-      } else this.validation.userName = null;
+      } else this.validation.first_name = null;
+
+      if (!this.user.last_name) {
+        this.validation.last_name = "Please provide a last name!";
+        validationPassed = false;
+      } else this.validation.last_name = null;
 
       if (!this.user.email) {
         this.validation.email = "Please provide a e-mail address!";
@@ -108,7 +116,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.success {
-  text-align: center;
-}
 </style>

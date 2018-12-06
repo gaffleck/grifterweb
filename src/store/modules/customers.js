@@ -1,6 +1,9 @@
+import ApiService from "@/services/api.service";
+
 const state = {
   signingUp: false,
-  customers: []
+  customers: [],
+  currentCustomer: null
 };
 
 // getters
@@ -12,67 +15,56 @@ const actions = {
     let value = !state.signingUp;
     commit("setSignUp", value);
   },
-  signUp({ commit, state }, user) {
-    return new Promise((resolve, reject) => {
-      let data = {
-        userName: user.userName,
-        email: user.email
-      };
-      console.log(data);
-      axios({
-        method: "post",
-        url: "https://grifter2.herokuapp.com/api/customers/",
-        data: data,
-        headers: {}
-      })
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          console.log(error);
-          reject(error);
-        });
-    });
+  async signUp({ commit, state }, user) {
+    let data = {
+      first_name: user.first_name,
+      last_name: user.last_name
+    };
+    try {
+      const customer = await ApiService.post("customers/", data);
+      commit("addCustomer", customer.data);
+      return true;
+    } catch (e) {
+      console.log(e.message);
+      return false;
+    }
   },
-  getACustomer({ commit, state }, customerId) {
-    return new Promise((resolve, reject) => {
-      if (state.customers[customerId]) resolve(state.customers[customerId]);
-      else {
-        commit("setCustomers", mockCustomers());
-        resolve(state.customers[customerId]);
-      }
-      //GO GET FROM THE SERVER
-    });
+  async getACustomer({ commit, state }, customerId) {
+    try {
+      const customer = await ApiService.get("customers/" + customerId);
+      commit("setCurrentCustomer", customer.data);
+      return true;
+    } catch (e) {
+      console.log(e.message);
+      return false;
+    }
   },
-  getAFriend({ commit, state }, { customerid, friendid }) {
-    return new Promise((resolve, reject) => {
-      if (
-        state.customers[customerid] &&
-        state.customers[customerid].friends[friendid]
-      )
-        resolve(state.customers[customerid].friends[friendid]);
-      else {
-        commit("setCustomers", mockCustomers());
-        resolve(state.customers[customerid].friends[friendid]);
-      }
-      //GO GET FROM THE SERVER
-    });
+  async getAllCustomers({ commit }) {
+    try {
+      const customers = await ApiService.get("customers");
+      commit("setCustomers", customers.data);
+      return true;
+    } catch (e) {
+      console.log(e.message);
+      return false;
+    }
+    //   commit("setCustomers", mockCustomers());
   },
-  getAllCustomers({ commit }) {
-    return new Promise((resolve, reject) => {
-      // axios
-      //   .get("https://grifter2.herokuapp.com/api/customers/")
-      //   .then(response => {
-      //     commit("setCustomers", response.data);
-      //     resolve(response);
-      //   })
-      //   .catch(error => {
-      //     console.log(error);
-      //     reject(error);
-      //   });
-      commit("setCustomers", mockCustomers());
-      resolve("success");
-    });
+  async createFriend({ commit, state, rootState }, values) {
+    let newFriend = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      customer: rootState.friends.creatingFriend.customerid
+    };
+    console.log(newFriend);
+    try {
+      const friend = await ApiService.post("friends/", newFriend);
+      commit("addFriend", friend.data);
+      return true;
+    } catch (e) {
+      console.log(e.message);
+      return false;
+    }
   }
 };
 
@@ -81,8 +73,17 @@ const mutations = {
   setSignUp(state, value) {
     return (state.signingUp = value);
   },
+  addCustomer(state, value) {
+    state.customers.push(value);
+  },
   setCustomers(state, value) {
     return (state.customers = value);
+  },
+  setCurrentCustomer(state, value) {
+    return (state.currentCustomer = value);
+  },
+  addFriend(state, value) {
+    state.currentCustomer.friends.push(value);
   }
 };
 
@@ -106,7 +107,7 @@ function mockCustomers() {
           firstName: "Andrew",
           lastName: "Devlin",
           giftBudget: 5000,
-          birthDay: "2018-02-01T22:13:05.500Z",
+          birthDay: "1983-02-12T22:13:05.500Z",
           giftHistory: [
             {
               giftID: 0,
@@ -120,7 +121,7 @@ function mockCustomers() {
           firstName: "Ryan",
           lastName: "McGinnis",
           giftBudget: 10000,
-          birthDay: "2018-02-01T22:13:05.500Z",
+          birthDay: "2018-02-12T22:13:05.500Z",
           giftHistory: [
             {
               giftID: 0,

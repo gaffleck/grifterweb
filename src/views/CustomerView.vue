@@ -1,19 +1,20 @@
 <template>
   <div class="area">
-    <div class="customer-view">
-      <div v-if="!customer">Loading...</div>
-      <div class="customer" v-else>
-        <div class="customer-inner">
+    <div class="view-container">
+      <div v-if="loading || !customer">Loading...</div>
+      <div v-else-if="error">THERE HAS BEEN AN ER-ROR</div>
+      <div class v-else>
+        <div class="view-header">
           <div>
-            <h2>{{ customer.userName }}</h2>
+            <h2>{{ fullName }}</h2>
             <div class="customer-email">{{ customer.email }}</div>
             <span
               class="h-color-white"
-            >{{ customer.friends ? customer.friends.length : '0' }} Friends</span>
+            >{{ customer.friends ? customer.friends.length : '0' }} Events</span>
           </div>
           <div class="customer-meta h-color-white">
             <Button v-on:click.native="addFriend" v-bind:variantClass="'secondary'">
-              <font-awesome-icon icon="plus" class="m-r-1"/>Add Friend
+              <font-awesome-icon icon="plus" class="m-r-1"/>Add Event
             </Button>
           </div>
         </div>
@@ -21,7 +22,7 @@
           <Button v-on:click.native="showFriends(true)">Friends</Button>
           <Button v-on:click.native="showFriends(false)" v-bind:variantClass="'secondary'">Calendar</Button>
         </div>-->
-        <div class="friends-views" v-if="customer.friends">
+        <div class="view-body" v-if="customer.friends">
           <div class="friends">
             <ul class="friends-inner">
               <Friend
@@ -55,38 +56,47 @@ export default {
     Button,
     Calendar
   },
+  computed: {
+    customer() {
+      return this.$store.state.customers.currentCustomer;
+    },
+    fullName() {
+      return this.customer.first_name + " " + this.customer.last_name;
+    }
+  },
   mounted() {
-    this.$store
-      .dispatch("customers/getACustomer", this.$route.params.id)
-      .then(res => {
-        this.customer = res;
-      })
-      .catch(error => {
-        this.error = error;
-      });
+    if (this.$store.dispatch("customers/getACustomer", this.$route.params.id))
+      this.loading = false;
+    else {
+      this.loading = false;
+      this.error = true;
+    }
   },
   methods: {
     addFriend: function() {
-      this.$store.dispatch("friends/toggleCreateFriend", null);
+      this.$store.dispatch("friends/toggleCreateFriend", {
+        customerid: this.customer.id,
+        targetDate: ""
+      });
     },
     loadFriend: function(friend) {
-      let customerid = this.customer.customerId;
-      let friendid = friend.friendID;
-      this.$router.push({ name: "friend", params: { customerid, friendid } });
+      let friendid = friend.id;
+      this.$router.push({ name: "friend", params: { friendid } });
     },
     showFriends: function(val) {
       this.showFriendList = val;
     },
-    addEvent: function(month, day) {
-      let thisYear = new Date().getFullYear();
-      let targetDate = new Date(thisYear, month, day);
-      this.$store.dispatch("friends/toggleCreateFriend", targetDate);
+    addEvent: function(targetDate) {
+      this.$store.dispatch("friends/toggleCreateFriend", {
+        customerid: this.customer.id,
+        targetDate
+      });
     }
   },
   data: function() {
     return {
-      error: null,
-      customer: null,
+      loading: true,
+      error: false,
       showFriendList: false
     };
   }
@@ -94,24 +104,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.customer-view {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.customer-inner {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  margin-bottom: spacing(4);
-}
-
-.friends-views {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: spacing(4);
-  align-items: start;
-}
-
 .friends {
   margin-bottom: spacing(2);
   z-index: 1;

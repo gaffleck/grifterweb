@@ -60,12 +60,12 @@ const actions = {
       return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
     }
   },
-  async sendMessage({ commit }, message) {
+  async sendMessage({ commit }, { addToActive, message }) {
     console.log(message);
     try {
       const result = await ApiService.post("twilioMessages/", message);
-      commit("addMessage", result.data);
-      return { success: true };
+      commit("addMessage", { addToActive, message: result.data });
+      return { success: true, message: result.data };
     } catch (e) {
       return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
     }
@@ -98,15 +98,19 @@ const mutations = {
   addConversation(state, update) {
     state.conversations[update.id] = update;
   },
-  addMessage(state, message) {
+  addMessage(state, { addToActive, message }) {
     if (!state.messages[message.To]) state.messages[message.To] = [];
     state.messages[message.To].push(message);
+    if (addToActive) state.activeConversation.messages.push(message);
   },
   hideConversation(state) {
     state.activeConversation = null;
   },
   showConversation(state, id) {
-    state.activeConversation = state.messages[id];
+    state.activeConversation = {
+      To: id,
+      messages: state.messages[id]
+    };
   }
 };
 

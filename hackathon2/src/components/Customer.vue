@@ -89,10 +89,13 @@ export default {
       this.messageSending = true;
       this.$store
         .dispatch("conversations/sendMessage", {
-          To: this.customer.phone_number,
-          Body: `${this.customer.first_name} are you looking for a ${
-            this.equip.make
-          } ${this.equip.model}?`
+          addToActive: true,
+          message: {
+            To: this.customer.phone_number,
+            Body: `${this.customer.first_name} are you looking for a ${
+              this.equip.make
+            } ${this.equip.model}?`
+          }
         })
         .then(result => {
           this.messageSending = false;

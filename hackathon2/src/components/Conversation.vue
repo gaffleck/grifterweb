@@ -3,7 +3,11 @@
     <div v-if="!success && !error && conversation">
       <h1>Conversation</h1>
       <ul class="messages">
-        <li class="message" v-for="message in conversation" :key="message.id">{{message.Body}}</li>
+        <li
+          class="message"
+          v-for="message in conversation.messages"
+          :key="message.id"
+        >{{message.Body}}</li>
       </ul>
       <fieldset class="m-t-2" :disabled="processing">
         <div class="message--composer">
@@ -11,6 +15,7 @@
           <Button v-on:click.native="sendMessage" :processing="processing">Send</Button>
         </div>
       </fieldset>
+      <Error v-if="error">{{ error }}</Error>
     </div>
   </Modal>
 </template>
@@ -18,6 +23,7 @@
 <script>
 import Modal from "@/components/Modal.vue";
 import Button from "@/components/Button.vue";
+import Error from "@/components/Error.vue";
 
 export default {
   name: "Conversation",
@@ -42,14 +48,17 @@ export default {
   methods: {
     sendMessage: function() {
       this.processing = true;
-
       this.$store
-        .dispatch("conversations/sendMessage", this.fields)
+        .dispatch("conversations/sendMessage", {
+          addToActive: true,
+          message: {
+            To: this.conversation.To,
+            Body: this.message
+          }
+        })
         .then(result => {
           this.processing = false;
-          if (!result.success) {
-            this.error = result.error;
-          }
+          if (!result.success) this.error = result.error;
         });
     },
     dismissModal: function() {

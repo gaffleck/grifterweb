@@ -51,13 +51,16 @@ const actions = {
   toggleAddContact({ commit }) {
     commit("setAddContact");
   },
-  toggleCreateCustomer({ commit, state }, { ...args }) {
-    let value = !state.creatingCustomer.value;
-    commit("setCreateCustomer", {
-      value,
-      targetDate: args.targetDate || null,
-      customerid: args.customerid || null
-    });
+  async createContact({ commit }, contact) {
+    contact.user = 1;
+    contact.image = "test.jpg";
+    try {
+      const result = await ApiService.post("contacts/", contact);
+      commit("addContact", result.data);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
+    }
   }
 };
 
@@ -74,6 +77,9 @@ const mutations = {
   },
   setCustomers(state, update) {
     state.customers = update;
+  },
+  addContact(state, result) {
+    state.customers.push(result);
   }
 };
 

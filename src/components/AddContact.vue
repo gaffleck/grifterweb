@@ -1,7 +1,7 @@
 <template>
   <Modal v-bind:close="dismissModal" v-bind:show="creatingContact">
     <div v-if="!success && !error">
-      <h1>Add a Customer</h1>
+      <h1>Add a Contact</h1>
       <fieldset class="m-t-2" :disabled="processing">
         <InputItem :label="'First Name'" :error="validation.first_name">
           <input
@@ -22,24 +22,27 @@
             name="phone"
           >
         </InputItem>
-        <InputItem :label="'Industry'" :error="validation.last_name">
-          <input type="text" v-model="fields.last_name" placeholder="eg. Smith" name="lastName">
+        <InputItem :label="'Industry'" :error="validation.industry">
+          <input type="text" v-model="fields.industry" placeholder="eg. Smith" name="industry">
         </InputItem>
-        <InputItem :label="'Quality'" :error="validation.last_name">
-          <input type="text" v-model="fields.last_name" placeholder="eg. Smith" name="lastName">
+        <InputItem :label="'Quality: ' + fields.quality" :error="validation.quality">
+          <input
+            type="range"
+            min="0"
+            max="10"
+            v-model="fields.quality"
+            placeholder="eg. Smith"
+            name="quality"
+          >
         </InputItem>
-        <Button
-          class="stretch"
-          v-on:click.native="addCustomer"
-          :processing="processing"
-        >Add Customer</Button>
+        <Button class="stretch" v-on:click.native="addContact" :processing="processing">Add Customer</Button>
       </fieldset>
     </div>
-    <div class="error" v-if="error"></div>
+    <Error v-if="error">{{error}}</Error>
     <div class="success" v-if="success">
       <div class="text-large">🎉</div>
-      <h2>Event Added Successfully!</h2>
-      <Button class="stretch m-t-4" v-on:click.native="addNew">Add Another Event</Button>
+      <h2>Contact Added Successfully!</h2>
+      <Button class="stretch m-t-4" v-on:click.native="addNew">Add Another Contact</Button>
     </div>
   </Modal>
 </template>
@@ -49,6 +52,7 @@ import Modal from "@/components/Modal.vue";
 import VueNumeric from "vue-numeric";
 import { setTimeout } from "timers";
 import Button from "@/components/Button.vue";
+import Error from "@/components/Error.vue";
 import InputItem from "@/components/InputItem.vue";
 
 function initialState() {
@@ -61,7 +65,7 @@ function initialState() {
       last_name: null,
       industry: null,
       phone_number: null,
-      quality: null
+      quality: 5
     },
     validation: {
       first_name: null,
@@ -91,18 +95,18 @@ export default {
     }
   },
   methods: {
-    addCustomer: function() {
+    addContact: function() {
       if (!this.validateForm()) return;
       this.processing = true;
 
       this.$store
         .dispatch("customers/createContact", this.fields)
         .then(result => {
-          if (result) {
-            this.processing = false;
+          this.processing = false;
+          if (result.success) {
             this.success = true;
           } else {
-            console.log("ERRRORRRR");
+            this.error = result.error;
           }
         });
       //POST TO SERVER
@@ -125,6 +129,11 @@ export default {
         this.validation.last_name = "Please provide a last name!";
         validationPassed = false;
       } else this.validation.last_name = null;
+
+      if (!this.fields.phone_number) {
+        this.validation.phone_number = "Please provide a phone number!";
+        validationPassed = false;
+      } else this.validation.phone_number = null;
 
       return validationPassed;
     },

@@ -13,6 +13,11 @@
       <Error v-else-if="error">{{error}}</Error>
       <ul v-else>
         <li v-for="asset in assets" :key="asset.id" class="asset" @click="goToAsset(asset.id)">
+          <img
+            :src="equipImg(asset.images[0].file_name)"
+            v-if="asset.images[0]"
+            class="asset-thumbnail"
+          >
           <div
             class="asset--description"
           >{{ asset.year }} {{asset.make}} {{asset.model}} {{asset.equipment_type}}</div>
@@ -53,6 +58,9 @@ export default {
     }
   },
   methods: {
+    equipImg(img) {
+      return process.env.BASE_URL + "img/" + img;
+    },
     search: function() {
       let equipmentid = 0;
       this.$router.push({ name: "equipment", params: { equipmentid } });
@@ -79,6 +87,25 @@ export default {
   padding: spacing(3);
   border-bottom: 1px solid #f5f5f5;
   cursor: pointer;
+  display: grid;
+  grid-template-areas: "thumbnail description" "thumbnail price";
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+}
+
+.asset-thumbnail {
+  grid-area: thumbnail;
+  height: 80px;
+  width: 120px;
+  display: block;
+  object-fit: cover;
+  margin-right: spacing(3);
+}
+.asset--description {
+  grid-area: description;
+}
+.asset--shoot {
+  grid-area: price;
 }
 </style>
 

@@ -21,7 +21,24 @@
           <div
             class="asset--description"
           >{{ asset.year }} {{asset.make}} {{asset.model}} {{asset.equipment_type}}</div>
-          <div class="asset--shoot">{{format(asset.shoot_price)}}</div>
+          <div class="asset--meta">
+            <div>
+              <label>Est. Value:</label>
+              {{format(asset.shoot_price)}}
+            </div>
+            <div>
+              <label>Matches ({{ contacts.length }})</label>
+              <div class="matches">
+                <img
+                  v-for="contact in contacts"
+                  :key="contact.id"
+                  :src="equipImg(contact.image)"
+                  class="match-thumbnail"
+                  v-tooltip.top="contact.first_name + ' ' + contact.last_name"
+                >
+              </div>
+            </div>
+          </div>
         </li>
       </ul>
     </div>
@@ -55,6 +72,9 @@ export default {
   computed: {
     assets() {
       return this.$store.state.equipment.allEquipment;
+    },
+    contacts() {
+      return this.$store.state.customers.customers;
     }
   },
   methods: {
@@ -62,7 +82,7 @@ export default {
       return process.env.BASE_URL + "img/" + img;
     },
     search: function() {
-      let equipmentid = 0;
+      let equipmentid = 2;
       this.$router.push({ name: "equipment", params: { equipmentid } });
     },
     format: function(amt) {
@@ -103,9 +123,34 @@ export default {
 }
 .asset--description {
   grid-area: description;
+  font-weight: 900;
 }
-.asset--shoot {
+.asset--meta {
   grid-area: price;
+  display: flex;
+
+  & > div {
+    margin-right: spacing(4);
+  }
+}
+
+.matches {
+  display: flex;
+}
+
+.match-thumbnail {
+  height: 30px;
+  width: 30px;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: -10px;
+  transition: margin 0.2s ease-in-out;
+
+  &:hover {
+    margin-right: 5px;
+    margin-left: 15px;
+  }
 }
 </style>
 

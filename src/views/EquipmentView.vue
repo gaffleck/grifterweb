@@ -31,9 +31,7 @@
       </div>
       <div class="asset--section">
         <h3>Potential Buyers</h3>
-        <div v-if="loadingCustomers">Loading...</div>
-        <Error v-else-if="errorCustomers">{{ error }}</Error>
-        <div v-else-if="customers.length === 0">Yo got no friends!</div>
+        <div v-if="customers.length === 0">Yo got no friends!</div>
         <ul>
           <Customer
             v-for="customer in customers"
@@ -68,10 +66,6 @@ export default {
         this.loading = false;
         if (!result.success) this.error = result.error;
       });
-    this.$store.dispatch("customers/getAllCustomers").then(result => {
-      this.loadingCustomers = false;
-      if (!result.success) this.errorCustomers = result.error;
-    });
   },
   computed: {
     equipment() {

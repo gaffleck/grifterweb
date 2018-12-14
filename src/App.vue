@@ -35,6 +35,7 @@ export default {
   mounted() {
     this.$store.dispatch("conversations/getMessages");
     this.$store.dispatch("conversations/getConversations");
+    this.$store.dispatch("customers/getAllCustomers");
   },
   methods: {
     showAddContact: function() {

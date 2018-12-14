@@ -4,8 +4,8 @@
     <Error v-else-if="error">{{ error }}</Error>
     <div class="asset" v-else>
       <carousel :perPage="1">
-        <slide v-for="(img,i) in equipment.img" :key="i">
-          <img :src="equipImg(img)" class="asset--image">
+        <slide v-for="(img,i) in equipment.images" :key="i">
+          <img :src="equipImg(img.file_name)" class="asset--image">
         </slide>
       </carousel>
       <div class="asset--section top--section">

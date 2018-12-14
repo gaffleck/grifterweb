@@ -1,5 +1,5 @@
 <template>
-  <Modal v-bind:close="dismissModal" v-bind:show="creatingCustomer.value">
+  <Modal v-bind:close="dismissModal" v-bind:show="creatingContact">
     <div v-if="!success && !error">
       <h1>Add a Customer</h1>
       <fieldset class="m-t-2" :disabled="processing">
@@ -14,11 +14,19 @@
         <InputItem :label="'Last Name'" :error="validation.last_name">
           <input type="text" v-model="fields.last_name" placeholder="eg. Smith" name="lastName">
         </InputItem>
-        <InputItem :label="'Date'" :error="validation.birthday">
-          <v-date-picker mode="single" v-model="fields.birthday"></v-date-picker>
+        <InputItem :label="'Phone Number'" :error="validation.phone_number">
+          <input
+            type="tel"
+            v-model="fields.phone_number"
+            placeholder="eg. +15555555555"
+            name="phone"
+          >
         </InputItem>
-        <InputItem :label="'Gift Budget'" :optional="true">
-          <vue-numeric currency="$" separator="," v-model="fields.budget"></vue-numeric>
+        <InputItem :label="'Industry'" :error="validation.last_name">
+          <input type="text" v-model="fields.last_name" placeholder="eg. Smith" name="lastName">
+        </InputItem>
+        <InputItem :label="'Quality'" :error="validation.last_name">
+          <input type="text" v-model="fields.last_name" placeholder="eg. Smith" name="lastName">
         </InputItem>
         <Button
           class="stretch"
@@ -48,24 +56,25 @@ function initialState() {
     error: null,
     processing: false,
     success: false,
-    eventType: "birthday",
     fields: {
       first_name: null,
       last_name: null,
-      birthday: null,
-      budget: null
+      industry: null,
+      phone_number: null,
+      quality: null
     },
     validation: {
       first_name: null,
       last_name: null,
-      birthday: null,
-      budget: null
+      industry: null,
+      phone_number: null,
+      quality: null
     }
   };
 }
 
 export default {
-  name: "AddCustomer",
+  name: "AddContact",
   components: {
     Modal,
     Button,
@@ -75,13 +84,10 @@ export default {
   data: function() {
     return initialState();
   },
-  mounted() {
-    this.fields.birthday = this.creatingCustomer.targetDate;
-  },
+  mounted() {},
   computed: {
-    creatingCustomer() {
-      this.fields.birthday = this.$store.state.customers.creatingCustomer.targetDate;
-      return this.$store.state.customers.creatingCustomer;
+    creatingContact() {
+      return this.$store.state.customers.creatingContact;
     }
   },
   methods: {
@@ -90,7 +96,7 @@ export default {
       this.processing = true;
 
       this.$store
-        .dispatch("customers/createFriend", this.fields)
+        .dispatch("customers/createContact", this.fields)
         .then(result => {
           if (result) {
             this.processing = false;
@@ -105,7 +111,7 @@ export default {
       this.resetData();
     },
     dismissModal: function() {
-      this.$store.dispatch("customer/toggleCreateCustomer");
+      this.$store.dispatch("customers/toggleAddContact");
       this.resetData();
     },
     validateForm: function() {

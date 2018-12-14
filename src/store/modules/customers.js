@@ -2,6 +2,7 @@ import ApiService from "@/services/api.service";
 
 const state = {
   customers: [],
+  creatingContact: false,
   creatingCustomer: {
     value: false,
     targetDate: null,
@@ -47,6 +48,9 @@ const actions = {
       return false;
     }
   },
+  toggleAddContact({ commit }) {
+    commit("setAddContact");
+  },
   toggleCreateCustomer({ commit, state }, { ...args }) {
     let value = !state.creatingCustomer.value;
     commit("setCreateCustomer", {
@@ -61,6 +65,9 @@ const actions = {
 const mutations = {
   setCreateCustomer(state, update) {
     Object.assign(state.creatingCustomer, update);
+  },
+  setAddContact(state) {
+    state.creatingContact = !state.creatingContact;
   },
   setCurrentCustomer(state, value) {
     return (state.currentCustomer = value);

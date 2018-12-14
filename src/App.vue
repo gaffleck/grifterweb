@@ -5,18 +5,21 @@
         <router-link to="/">Available Equipment</router-link>|
         <router-link to="/customers">Contacts</router-link>
       </div>
+      <div class="nav--actions">
+        <Button v-on:click.native="showAddContact" :variantClass="'secondary'">Add A Contact</Button>
+      </div>
     </div>
     <div class="content">
       <router-view/>
     </div>
     <Conversation/>
-    <AddCustomer/>
+    <AddContact/>
     <SignUp/>
   </div>
 </template>
 
 <script>
-import AddCustomer from "@/components/AddCustomer.vue";
+import AddContact from "@/components/AddContact.vue";
 import Conversation from "@/components/Conversation.vue";
 import SignUp from "@/components/SignUp.vue";
 import Button from "@/components/Button.vue";
@@ -24,7 +27,7 @@ import Button from "@/components/Button.vue";
 export default {
   name: "customers",
   components: {
-    AddCustomer,
+    AddContact,
     Conversation,
     SignUp,
     Button
@@ -34,8 +37,8 @@ export default {
     this.$store.dispatch("conversations/getConversations");
   },
   methods: {
-    showSingup: function() {
-      this.$store.dispatch("customers/toggleSignUp");
+    showAddContact: function() {
+      this.$store.dispatch("customers/toggleAddContact");
     }
   }
 };

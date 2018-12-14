@@ -60,6 +60,11 @@ button {
       animation: waitinganimation 1s ease-in-out infinite alternate;
     }
   }
+
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 @keyframes waitinganimation {

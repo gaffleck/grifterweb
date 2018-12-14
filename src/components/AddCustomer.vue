@@ -1,44 +1,17 @@
 <template>
-  <Modal v-bind:close="dismissModal" v-bind:show="creatingFriend.value">
+  <Modal v-bind:close="dismissModal" v-bind:show="creatingCustomer.value">
     <div v-if="!success && !error">
-      <h1>Add an Event</h1>
-      <div class="selectors m-t-2">
-        <div>
-          <input id="birthday" type="radio" v-model="eventType" value="birthday">
-          <label for="birthday">
-            <h1>🎉</h1>
-            <span>Birthday</span>
-          </label>
-        </div>
-        <div>
-          <input id="anniversary" type="radio" v-model="eventType" value="anniversary">
-          <label for="anniversary">
-            <h1>💍</h1>
-            <span>Anniversary</span>
-          </label>
-        </div>
-        <div>
-          <input id="occasion" type="radio" v-model="eventType" value="occasion">
-          <label for="occasion">
-            <h1>⭐️</h1>
-            <span>Occasion</span>
-          </label>
-        </div>
-      </div>
-      <fieldset class="m-t-4" :disabled="processing">
-        <InputItem :label="nameLabel" :error="validation.first_name">
+      <h1>Add a Customer</h1>
+      <fieldset class="m-t-2" :disabled="processing">
+        <InputItem :label="'First Name'" :error="validation.first_name">
           <input
             type="text"
             v-model="fields.first_name"
-            :placeholder="placeholderText"
+            :placeholder="'eg. Susan'"
             name="firstName"
           >
         </InputItem>
-        <InputItem
-          :label="'Last Name'"
-          :error="validation.last_name"
-          v-if="eventType === 'birthday'"
-        >
+        <InputItem :label="'Last Name'" :error="validation.last_name">
           <input type="text" v-model="fields.last_name" placeholder="eg. Smith" name="lastName">
         </InputItem>
         <InputItem :label="'Date'" :error="validation.birthday">
@@ -47,7 +20,11 @@
         <InputItem :label="'Gift Budget'" :optional="true">
           <vue-numeric currency="$" separator="," v-model="fields.budget"></vue-numeric>
         </InputItem>
-        <Button class="stretch" v-on:click.native="addFriend" :processing="processing">Add Event</Button>
+        <Button
+          class="stretch"
+          v-on:click.native="addCustomer"
+          :processing="processing"
+        >Add Customer</Button>
       </fieldset>
     </div>
     <div class="error" v-if="error"></div>
@@ -88,7 +65,7 @@ function initialState() {
 }
 
 export default {
-  name: "AddFriend",
+  name: "AddCustomer",
   components: {
     Modal,
     Button,
@@ -99,30 +76,16 @@ export default {
     return initialState();
   },
   mounted() {
-    this.fields.birthday = this.creatingFriend.targetDate;
+    this.fields.birthday = this.creatingCustomer.targetDate;
   },
   computed: {
-    creatingFriend() {
-      this.fields.birthday = this.$store.state.friends.creatingFriend.targetDate;
-      return this.$store.state.friends.creatingFriend;
-    },
-    nameLabel() {
-      return this.eventType === "birthday"
-        ? "First Name"
-        : this.eventType === "anniversary"
-        ? "Which Anniversary"
-        : "Occasion Name";
-    },
-    placeholderText() {
-      return this.eventType === "birthday"
-        ? "eg. John"
-        : this.eventType === "anniversary"
-        ? "eg. Wedding Anniversary"
-        : "eg. First Day at Work";
+    creatingCustomer() {
+      this.fields.birthday = this.$store.state.customers.creatingCustomer.targetDate;
+      return this.$store.state.customers.creatingCustomer;
     }
   },
   methods: {
-    addFriend: function() {
+    addCustomer: function() {
       if (!this.validateForm()) return;
       this.processing = true;
 
@@ -142,7 +105,7 @@ export default {
       this.resetData();
     },
     dismissModal: function() {
-      this.$store.dispatch("friends/toggleCreateFriend");
+      this.$store.dispatch("customer/toggleCreateCustomer");
       this.resetData();
     },
     validateForm: function() {
@@ -152,15 +115,11 @@ export default {
         validationPassed = false;
       } else this.validation.first_name = null;
 
-      if (this.eventType === "birthday" && !this.fields.last_name) {
+      if (!this.fields.last_name) {
         this.validation.last_name = "Please provide a last name!";
         validationPassed = false;
       } else this.validation.last_name = null;
 
-      if (!this.fields.birthday) {
-        this.validation.birthday = "Please provide their birthday!";
-        validationPassed = false;
-      } else this.validation.birthday = null;
       return validationPassed;
     },
     resetData: function() {

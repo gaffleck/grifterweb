@@ -58,6 +58,7 @@ export default {
   justify-content: center;
   align-items: center;
   z-index: 100;
+  overflow-y: auto;
 }
 .modal-body {
   width: 100%;

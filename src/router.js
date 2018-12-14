@@ -33,10 +33,10 @@ export default new Router({
         import(/* webpackChunkName: "customerview" */ "./views/CustomerView.vue")
     },
     {
-      path: "/friend/:friendid",
-      name: "friend",
+      path: "/equipment/:equipmentid",
+      name: "equipment",
       component: () =>
-        import(/* webpackChunkName: "friendview" */ "./views/FriendView.vue")
+        import(/* webpackChunkName: "equipmentview" */ "./views/EquipmentView.vue")
     }
   ]
 });

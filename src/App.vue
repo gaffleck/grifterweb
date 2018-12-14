@@ -2,33 +2,36 @@
   <div id="app">
     <div id="nav">
       <div class="nav--links">
-        <router-link to="/">Home</router-link>|
-        <router-link to="/customers">Customers</router-link>|
-        <router-link to="/about">About</router-link>
-      </div>
-      <div class="nav--actions">
-        <Button v-on:click.native="showSingup" :variantClass="'secondary'">Sign-Up</Button>
+        <router-link to="/">Available Equipment</router-link>|
+        <router-link to="/customers">Contacts</router-link>
       </div>
     </div>
     <div class="content">
       <router-view/>
     </div>
-    <AddFriend/>
+    <Conversation/>
+    <AddCustomer/>
     <SignUp/>
   </div>
 </template>
 
 <script>
-import AddFriend from "@/components/AddFriend.vue";
+import AddCustomer from "@/components/AddCustomer.vue";
+import Conversation from "@/components/Conversation.vue";
 import SignUp from "@/components/SignUp.vue";
 import Button from "@/components/Button.vue";
 
 export default {
   name: "customers",
   components: {
-    AddFriend,
+    AddCustomer,
+    Conversation,
     SignUp,
     Button
+  },
+  mounted() {
+    this.$store.dispatch("conversations/getMessages");
+    this.$store.dispatch("conversations/getConversations");
   },
   methods: {
     showSingup: function() {

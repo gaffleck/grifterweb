@@ -1,7 +1,10 @@
-$primary: #b721ff;
-$secondary: #21d4fd;
+$primary: #e87511;
+$secondary: #003a70;
+$blue: #0072c2;
+$grey-200: #dddddd;
+$red: #da461f;
 
-$gradient: linear-gradient(19deg, $secondary 0%, $primary 100%);
+$gradient: linear-gradient(19deg, darken($primary, 20%) 0%, $primary 100%);
 
 .h-color-primary {
   color: $primary;
@@ -11,13 +14,15 @@ $gradient: linear-gradient(19deg, $secondary 0%, $primary 100%);
   color: white;
 }
 
-@mixin preshadow {
+@mixin preshadow($border-radius: 2) {
   position: relative;
+  z-index: 1;
 
   &:before {
     content: "";
     position: absolute;
     background-color: white;
+    border-radius: spacing($border-radius);
     top: 10px;
     bottom: 10px;
     left: 10px;
@@ -25,5 +30,17 @@ $gradient: linear-gradient(19deg, $secondary 0%, $primary 100%);
     box-shadow: 0 24px 30px 0 rgba(185, 91, 243, 0.25),
       0 24px 30px 0 rgba(0, 0, 0, 0.5);
     z-index: -1;
+  }
+
+  &:after {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-radius: spacing($border-radius);
   }
 }

@@ -1,9 +1,14 @@
 import ApiService from "@/services/api.service";
 
 const state = {
-  signingUp: false,
   customers: [],
-  currentCustomer: null
+  creatingCustomer: {
+    value: false,
+    targetDate: null,
+    customerid: null
+  },
+  currentCustomer: null,
+  messages: []
 };
 
 // getters
@@ -11,79 +16,57 @@ const getters = {};
 
 // actions
 const actions = {
-  toggleSignUp({ commit, state }) {
-    let value = !state.signingUp;
-    commit("setSignUp", value);
-  },
-  async signUp({ commit, state }, user) {
-    let data = {
-      first_name: user.first_name,
-      last_name: user.last_name
-    };
-    try {
-      const customer = await ApiService.post("customers/", data);
-      commit("addCustomer", customer.data);
-      return true;
-    } catch (e) {
-      console.log(e.message);
-      return false;
-    }
-  },
-  async getACustomer({ commit, state }, customerId) {
-    try {
-      const customer = await ApiService.get("customers/" + customerId);
-      commit("setCurrentCustomer", customer.data);
-      return true;
-    } catch (e) {
-      console.log(e.message);
-      return false;
-    }
-  },
   async getAllCustomers({ commit }) {
     try {
-      const customers = await ApiService.get("customers");
-      commit("setCustomers", customers.data);
-      return true;
+      const customers = await ApiService.get("contacts/");
+      let cleanCustomers = customers.data.results.filter(
+        item => typeof item != "undefined"
+      );
+      commit("setCustomers", cleanCustomers);
+      return { success: true };
     } catch (e) {
-      console.log(e.message);
-      return false;
+      return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
     }
-    //   commit("setCustomers", mockCustomers());
   },
-  async createFriend({ commit, state, rootState }, values) {
-    let newFriend = {
-      first_name: values.first_name,
-      last_name: values.last_name,
-      customer: rootState.friends.creatingFriend.customerid
-    };
-    console.log(newFriend);
+  async getMatchingCustomers({ commit }) {
     try {
-      const friend = await ApiService.post("friends/", newFriend);
-      commit("addFriend", friend.data);
+      await delay(1000);
+      commit("setCustomers", customers);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
+    }
+  },
+  async getACustomer({ commit, state }, { friendid }) {
+    try {
+      const friend = await ApiService.get("friends/" + friendid);
+      commit("setCurrentCustomer", friend.data);
       return true;
     } catch (e) {
       console.log(e.message);
       return false;
     }
+  },
+  toggleCreateCustomer({ commit, state }, { ...args }) {
+    let value = !state.creatingCustomer.value;
+    commit("setCreateCustomer", {
+      value,
+      targetDate: args.targetDate || null,
+      customerid: args.customerid || null
+    });
   }
 };
 
 // mutations
 const mutations = {
-  setSignUp(state, value) {
-    return (state.signingUp = value);
-  },
-  addCustomer(state, value) {
-    state.customers.push(value);
-  },
-  setCustomers(state, value) {
-    return (state.customers = value);
+  setCreateCustomer(state, update) {
+    Object.assign(state.creatingCustomer, update);
   },
   setCurrentCustomer(state, value) {
     return (state.currentCustomer = value);
   },
-  addFriend(state, value) {
-    state.currentCustomer.friends.push(value);
+  setCustomers(state, update) {
+    state.customers = update;
   }
 };
 
@@ -95,98 +78,49 @@ export default {
   mutations
 };
 
-function mockCustomers() {
-  return [
-    {
-      userName: "liamlevesque",
-      email: "liamlevesque@gmail.com",
-      customerId: 0,
-      friends: [
-        {
-          friendID: 0,
-          firstName: "Andrew",
-          lastName: "Devlin",
-          giftBudget: 5000,
-          birthDay: "1983-02-12T22:13:05.500Z",
-          giftHistory: [
-            {
-              giftID: 0,
-              giftName: "Power Ranger Action Figure",
-              dateGiven: "2018-12-01T22:13:05.500Z"
-            }
-          ]
-        },
-        {
-          friendID: 1,
-          firstName: "Ryan",
-          lastName: "McGinnis",
-          giftBudget: 10000,
-          birthDay: "2018-02-12T22:13:05.500Z",
-          giftHistory: [
-            {
-              giftID: 0,
-              giftName: "Power Ranger Action Figure",
-              dateGiven: "2018-12-01T22:13:05.500Z"
-            }
-          ]
-        },
-        {
-          friendID: 2,
-          firstName: "Shannon",
-          lastName: "Levesque",
-          giftBudget: 250000,
-          birthDay: "1983-08-17T22:13:05.500Z",
-          giftHistory: [
-            {
-              giftID: 0,
-              giftName: "Power Ranger Action Figure",
-              dateGiven: "2018-12-01T22:13:05.500Z"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      userName: "andrewdevlin",
-      email: "adevlin@gmail.com",
-      customerId: 1,
-      friends: [
-        {
-          friendID: 0,
-          firstName: "Tommy",
-          lastName: "Caldwell",
-          giftBudget: 50,
-          birthDay: "2018-12-01T22:13:05.500Z",
-          giftHistory: [
-            {
-              giftID: 0,
-              giftName: "Power Ranger Action Figure",
-              dateGiven: "2018-12-01T22:13:05.500Z"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      userName: "jamesmallion",
-      email: "jmallion@gmail.com",
-      customerId: 2,
-      friends: [
-        {
-          friendID: 0,
-          firstName: "Ruth",
-          lastName: "Murray",
-          giftBudget: 2000,
-          birthDay: "2018-12-01T22:13:05.500Z",
-          giftHistory: [
-            {
-              giftID: 0,
-              giftName: "Super Soaker 150",
-              dateGiven: "2018-12-01T22:13:05.500Z"
-            }
-          ]
-        }
-      ]
-    }
-  ];
-}
+const customers = [
+  {
+    name: "Geoff Affleck",
+    id: 0,
+    email: "gaffleck@gmail.com",
+    img: "user1.jpg",
+    industry: "Construction",
+    quality: 7,
+    notes: [
+      {
+        dateAdded: "Wed Dec 12 2018 05:23:26 GMT-0800 (Pacific Standard Time)"
+      }
+    ],
+    warmedAssets: [],
+    pastPurchases: [
+      {
+        asset: "2015 Cat 980",
+        price: 12500000,
+        img: "asset.jpg"
+      }
+    ]
+  },
+  {
+    name: "John Denver",
+    id: 1,
+    email: "jdenver@gmail.com",
+    img: "user1.jpg",
+    industry: "Construction",
+    quality: 9,
+    notes: [
+      {
+        dateAdded: "Wed Dec 12 2018 05:23:26 GMT-0800 (Pacific Standard Time)"
+      }
+    ],
+    warmedAssets: [],
+    pastPurchases: [
+      {
+        asset: "2015 Cat 980",
+        price: 12500000,
+        img: "asset.jpg"
+      }
+    ]
+  }
+];
+
+const delay = duration => new Promise(resolve => setTimeout(resolve, duration));

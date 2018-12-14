@@ -1,13 +1,30 @@
 <template>
   <li class="customer" v-on:click="loadCustomer">
     <div class="customer-inner">
-      <div class="customer-header">
-        <h2>{{ customer.name }}</h2>
-        <div class="customer-email">{{ customer.email }}</div>
+      <div class="customer--avatar">
+        <img :src="userImg(customer.image)">
       </div>
-      <div class="customer-action">
-        <Button v-if="!messageSent" @click.native="checkInterest">Check Interest</Button>
-        <span v-else>Sent Check...</span>
+      <div class="customer-header">
+        <h2>{{ fullName }}</h2>
+        <div class="customer-email">{{ customer.phone_number }}</div>
+      </div>
+      <div class="customer-action" v-if="equip">
+        <!-- <Button
+          v-if="!messageSent && !conversation"
+          @click.native="checkInterest"
+          :processing="messageSending"
+        >Check Interest</Button>
+        <Button v-else @click.native="showConversation" :variantClass="'secondary'">Message Sent</Button>-->
+        <Button
+          v-if="customer.phone_number && !conversation"
+          @click.native="sendMessage"
+          :processing="messageSending"
+        >Send Warm-Up Msg</Button>
+        <Button
+          v-if="conversation"
+          @click.native="showConversation"
+          :variantClass="'secondary'"
+        >View Messages</Button>
       </div>
       <div class="customer-meta h-color-primary h-cursor-pointer">
         <div>
@@ -20,7 +37,7 @@
         </div>
         <div>
           <label>Past Purchases</label>
-          <div>{{customer.pastPurchases.length}}</div>
+          <div>{{customer.purchases.length}}</div>
         </div>
       </div>
     </div>
@@ -37,33 +54,81 @@ export default {
   },
   props: {
     customer: Object,
-    equip: Number
+    equip: Object
   },
   data: function() {
-    return {};
+    return {
+      messageSent: false,
+      messageSending: false
+    };
   },
   mounted() {},
   computed: {
     fullName() {
       return this.customer.first_name + " " + this.customer.last_name;
     },
-    messageSent() {
-      return this.$store.state.customers.messages.filter(i => {
-        return i.customerid === this.customer.id && i.equipid === this.equip;
-      }).length;
+    conversation() {
+      return this.$store.getters["conversations/customerConversation"](
+        this.customer.phone_number
+      );
+      // return this.$store.getters["conversations/assetCustomerConversation"](
+      //   this.equip.id,
+      //   this.customer.id
+      // );
     }
   },
   methods: {
+    userImg(img) {
+      return process.env.BASE_URL + "img/" + img;
+    },
     loadCustomer: function() {
       let id = this.customer.id;
       // this.$router.push({ name: "customer", params: { id } });
     },
+    sendMessage: function() {
+      this.messageSending = true;
+      this.$store
+        .dispatch("conversations/sendMessage", {
+          To: this.customer.phone_number,
+          Body: `${this.customer.first_name} are you looking for a ${
+            this.equip.make
+          } ${this.equip.model}?`
+        })
+        .then(result => {
+          this.messageSending = false;
+          if (result.success) this.messageSent = true;
+        });
+    },
     checkInterest: function() {
-      this.$store.dispatch("customers/sendMessage", {
-        customerid: this.customer.id,
-        equipid: this.equip
-      });
+      this.messageSending = true;
+      this.$store
+        .dispatch("conversations/startConversation", {
+          conversation: {
+            user: 1,
+            contact: this.customer.id,
+            asset: this.equip.id
+          },
+          message: {
+            To: this.customer.phone_number,
+            Body: `Hey ${this.customer.first_name}, are you looking for a ${
+              this.equip.make
+            } ${this.equip.model} ${
+              this.equip.equipment_type
+            }? If you are interested, holla at me!`
+          }
+        })
+        .then(result => {
+          this.messageSending = false;
+          console.log("DONE", result);
+          if (result.success) this.messageSent = true;
+        });
       // this.customer.warmedAssets[this.equip] = "100000";
+    },
+    showConversation: function() {
+      this.$store.dispatch(
+        "conversations/showConversation",
+        this.customer.phone_number
+      );
     }
   }
 };
@@ -74,15 +139,26 @@ export default {
 .customer {
   margin-bottom: spacing(2);
   z-index: 1;
+  border-bottom: 1px solid $grey-200;
 }
 
 .customer-inner {
   background-color: white;
   padding: spacing(2) spacing(3);
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 50px 1fr auto;
   grid-template-rows: 1fr;
-  grid-template-areas: "header action" "meta meta";
+  grid-template-areas: "avatar header action" "meta meta meta";
+}
+.customer--avatar {
+  grid-area: avatar;
+
+  img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 }
 
 .customer-header {
@@ -99,9 +175,11 @@ export default {
 
 .customer-meta {
   grid-area: meta;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  grid-gap: spacing(2);
+  display: flex;
+
+  & > div {
+    flex-basis: 33%;
+  }
 }
 
 .friends {

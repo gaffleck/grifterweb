@@ -1,7 +1,8 @@
 import ApiService from "@/services/api.service";
 
 const state = {
-  currentEquipment: {}
+  currentEquipment: {},
+  allEquipment: []
 };
 
 // getters
@@ -9,10 +10,19 @@ const getters = {};
 
 // actions
 const actions = {
+  async getAllEquipment({ commit }) {
+    try {
+      const assets = await ApiService.get("assets/");
+      commit("setAllEquipment", assets.data.results);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
+    }
+  },
   async getEquipment({ commit, state }, id) {
     try {
-      const asset = await delay(1000);
-      commit("setCurrentEquipment", assets[id]);
+      const asset = await ApiService.get("assets/" + id + "/");
+      commit("setCurrentEquipment", asset.data);
       return { success: true };
     } catch (e) {
       return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
@@ -24,6 +34,9 @@ const actions = {
 const mutations = {
   setCurrentEquipment(state, update) {
     Object.assign(state.currentEquipment, update);
+  },
+  setAllEquipment(state, update) {
+    state.allEquipment = update;
   }
 };
 
@@ -45,6 +58,8 @@ const assets = [
     category: "Wheel Loader",
     lot: "255",
     sellingAt: "22 Jan 2018 in Edmonton",
+    marketValue: 12500000,
+    selling: true,
     img: [
       "asset.jpg",
       "asset2.jpg",

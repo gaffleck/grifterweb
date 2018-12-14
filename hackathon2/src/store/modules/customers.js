@@ -16,18 +16,26 @@ const getters = {};
 
 // actions
 const actions = {
-  async getMatchingCustomers({ commit }) {
-    console.log("NICE");
+  async getAllCustomers({ commit }) {
     try {
-      await delay(2000);
-      commit("setCustomers", customers);
+      const customers = await ApiService.get("contacts/");
+      let cleanCustomers = customers.data.results.filter(
+        item => typeof item != "undefined"
+      );
+      commit("setCustomers", cleanCustomers);
       return { success: true };
     } catch (e) {
       return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
     }
   },
-  sendMessage({ commit }, update) {
-    commit("addMessage", update);
+  async getMatchingCustomers({ commit }) {
+    try {
+      await delay(1000);
+      commit("setCustomers", customers);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: "THERE HAS BEEN AN ERRR-OR" };
+    }
   },
   async getACustomer({ commit, state }, { friendid }) {
     try {
@@ -58,17 +66,7 @@ const mutations = {
     return (state.currentCustomer = value);
   },
   setCustomers(state, update) {
-    update.forEach(item => {
-      state.customers[item.id] = item;
-    });
-  },
-  addMessage(state, update) {
-    state.customers[update.customerid].warmedAssets.push(update.equipid);
-    state.messages.push({
-      equipid: update.equipid,
-      customerid: update.customerid,
-      sent: new Date()
-    });
+    state.customers = update;
   }
 };
 

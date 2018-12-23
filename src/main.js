@@ -10,12 +10,17 @@ import ApiService from "./services/api.service";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faTimes, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTimes,
+  faPlus,
+  faSearch,
+  faEye
+} from "@fortawesome/free-solid-svg-icons";
 import VCalendar from "v-calendar";
 import "v-calendar/lib/v-calendar.min.css";
 import "@/styles/general.scss";
 
-library.add(faTimes, faPlus, faSearch);
+library.add(faTimes, faPlus, faSearch, faEye);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
 Vue.use(VCalendar, {

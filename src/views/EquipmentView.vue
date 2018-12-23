@@ -5,29 +5,22 @@
     <div class="asset" v-else>
       <carousel :perPage="1">
         <slide v-for="(img,i) in equipment.images" :key="i">
-          <img :src="equipImg(img.file_name)" class="asset--image">
+          <img :src="img.file_name" class="asset--image">
         </slide>
       </carousel>
       <div class="asset--section top--section">
-        <h2
-          class="text-align-center"
-        >{{ equipment.year }} {{ equipment.make }} {{ equipment.model }} {{ equipment.equipment_type }}</h2>
-        <div
+        <h2 class="text-align-center">{{ equipment.title }}</h2>
+        <Button v-if="!isOnWatchlist" @click.native="addToWatchlist">
+          <font-awesome-icon icon="eye"/>Add To Watchlist
+        </Button>
+        <span v-else>
+          <font-awesome-icon icon="eye"/>Watching
+        </span>
+        <AssetBidding
           v-if="equipment.shoot_price"
-          class="selling-chart"
-          :style="'--progress:'+ Math.floor(auction.bidPrice / equipment.shoot_price * 100) + '%'"
-        >
-          <div class="barchart">
-            <div class="bar"></div>
-          </div>
-          <div class="bid">{{ format(equipment.shoot_price) }}</div>
-          <div class="market">{{ format(auction.bidPrice) }}</div>
-          <div class="ratio">
-            <div
-              class="ratio--amt"
-            >{{ Math.floor(auction.bidPrice / equipment.shoot_price * 100) }}%</div>
-          </div>
-        </div>
+          :shootPrice="equipment.shoot_price"
+          :bidPrice="auction.bidPrice"
+        />
       </div>
       <div class="asset--section">
         <h3>Potential Buyers</h3>
@@ -48,6 +41,8 @@
 <script>
 import { Carousel, Slide } from "vue-carousel";
 import Customer from "@/components/Customer";
+import AssetBidding from "@/components/AssetBidding";
+import Button from "@/components/Button";
 import Error from "@/components/Error.vue";
 import formatMoney from "@/lib/formatMoney";
 
@@ -57,7 +52,9 @@ export default {
     Carousel,
     Slide,
     Error,
-    Customer
+    Customer,
+    AssetBidding,
+    Button
   },
   mounted() {
     this.$store
@@ -78,6 +75,9 @@ export default {
       return Object.values(
         this.$store.state.conversations.conversations
       ).filter(item => item.asset === this.equipment.id);
+    },
+    isOnWatchlist() {
+      return this.$store.getters["accounts/isOnWatchlist"](this.equipment.id);
     }
   },
   methods: {
@@ -86,6 +86,9 @@ export default {
     },
     format: function(amt) {
       return formatMoney(amt);
+    },
+    addToWatchlist() {
+      this.$store.dispatch("accounts/addToWatchlist", this.equipment.id);
     }
   },
   data: function() {
@@ -144,57 +147,5 @@ export default {
   top: -1 * spacing(5);
   margin-top: 0;
   margin-bottom: -1 * spacing(5);
-}
-
-.selling-chart {
-  display: grid;
-  grid-template-areas: "ratio ratio" "bar bar" "market bid";
-  grid-template-columns: 1fr auto;
-  grid-template-areas: auto auto auto;
-  --progress: 0;
-}
-
-.market {
-  grid-area: market;
-}
-
-.bid {
-  grid-area: bid;
-}
-
-.barchart,
-.bar {
-  height: spacing(4);
-  border-radius: spacing(4);
-  background-color: #f5f5f5;
-}
-
-.barchart {
-  grid-area: bar;
-  margin-top: 5px;
-}
-
-.bar {
-  background-color: $primary;
-  width: var(--progress);
-}
-
-.ratio {
-  grid-area: bar;
-
-  .ratio--amt {
-    position: relative;
-    left: var(--progress);
-    transform: translateX(-50%);
-    background-color: white;
-    box-shadow: 2px 2px 2px 0 rgba(black, 0.5);
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-weight: 900;
-  }
 }
 </style>

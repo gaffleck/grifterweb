@@ -1,6 +1,6 @@
 <template>
   <div class="area">
-    <div class="box">
+    <section class="section">
       <fieldset>
         <div class="searchinput">
           <input type="text" placeholder="Find Equipment" v-model="searchString">
@@ -12,48 +12,22 @@
       <span v-if="loading">Loading...</span>
       <Error v-else-if="error">{{error}}</Error>
       <ul v-else>
-        <li v-for="asset in assets" :key="asset.id" class="asset" @click="goToAsset(asset.id)">
-          <img
-            :src="equipImg(asset.images[0].file_name)"
-            v-if="asset.images[0]"
-            class="asset-thumbnail"
-          >
-          <div
-            class="asset--description"
-          >{{ asset.year }} {{asset.make}} {{asset.model}} {{asset.equipment_type}}</div>
-          <div class="asset--meta">
-            <div>
-              <label>Est. Value:</label>
-              {{format(asset.shoot_price)}}
-            </div>
-            <div>
-              <label>Matches ({{ contacts.length }})</label>
-              <div class="matches">
-                <img
-                  v-for="contact in contacts"
-                  :key="contact.id"
-                  :src="equipImg(contact.image)"
-                  class="match-thumbnail"
-                  v-tooltip.top="contact.first_name + ' ' + contact.last_name"
-                >
-              </div>
-            </div>
-          </div>
-        </li>
+        <AssetTile v-for="asset in assets" :asset="asset" :key="asset.id" :contacts="contacts"/>
       </ul>
-    </div>
+    </section>
   </div>
 </template>
 
 <script>
 import Button from "@/components/Button.vue";
+import AssetTile from "@/components/AssetTile.vue";
 import Error from "@/components/Error";
-import formatMoney from "@/lib/formatMoney";
 
 export default {
   name: "home",
   components: {
     Button,
+    AssetTile,
     Error
   },
   data: function() {
@@ -78,79 +52,25 @@ export default {
     }
   },
   methods: {
-    equipImg(img) {
-      return process.env.BASE_URL + "img/" + img;
-    },
     search: function() {
       let equipmentid = 2;
       this.$router.push({ name: "equipment", params: { equipmentid } });
-    },
-    format: function(amt) {
-      return formatMoney(amt);
-    },
-    goToAsset: function(id) {
-      this.$router.push({ name: "equipment", params: { equipmentid: id } });
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: 200px;
+}
+
 .searchinput {
   display: grid;
   grid-template-areas: "input button";
   grid-template-columns: 1fr auto;
-}
-
-.asset {
-  @include preshadow(0);
-  padding: spacing(3);
-  border-bottom: 1px solid #f5f5f5;
-  cursor: pointer;
-  display: grid;
-  grid-template-areas: "thumbnail description" "thumbnail price";
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-}
-
-.asset-thumbnail {
-  grid-area: thumbnail;
-  height: 80px;
-  width: 120px;
-  display: block;
-  object-fit: cover;
-  margin-right: spacing(3);
-}
-.asset--description {
-  grid-area: description;
-  font-weight: 900;
-}
-.asset--meta {
-  grid-area: price;
-  display: flex;
-
-  & > div {
-    margin-right: spacing(4);
-  }
-}
-
-.matches {
-  display: flex;
-}
-
-.match-thumbnail {
-  height: 30px;
-  width: 30px;
-  display: block;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: -10px;
-  transition: margin 0.2s ease-in-out;
-
-  &:hover {
-    margin-right: 5px;
-    margin-left: 15px;
-  }
 }
 </style>
 

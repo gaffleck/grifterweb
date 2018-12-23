@@ -55,8 +55,6 @@ export default {
   height: 100vh;
   background-color: rgba(white, 0.9);
   display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 100;
   overflow-y: auto;
 }
@@ -66,6 +64,7 @@ export default {
   padding: 40px;
   background-color: white;
   position: relative;
+  margin: auto;
 
   @include preshadow;
 }

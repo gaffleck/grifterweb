@@ -2,11 +2,16 @@ import ApiService from "@/services/api.service";
 
 const state = {
   signingUp: false,
-  currentUser: null
+  currentUser: null,
+  watchlist: []
 };
 
 // getters
-const getters = {};
+const getters = {
+  isOnWatchlist: state => id => {
+    return state.watchlist.indexOf(id) >= 0;
+  }
+};
 
 // actions
 const actions = {
@@ -64,6 +69,9 @@ const actions = {
       console.log(e.message);
       return false;
     }
+  },
+  async addToWatchlist({ commit }, asset) {
+    commit("addToWatchlist", asset);
   }
 };
 
@@ -83,6 +91,9 @@ const mutations = {
   },
   addFriend(state, value) {
     state.currentCustomer.friends.push(value);
+  },
+  addToWatchlist(state, asset) {
+    if (state.watchlist.indexOf(asset) === -1) state.watchlist.push(asset);
   }
 };
 

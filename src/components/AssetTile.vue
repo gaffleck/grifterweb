@@ -19,6 +19,11 @@
           >
         </div>
       </div>
+      <div class="note">
+        <span v-if="hasNote" v-tooltip.top="hasNote.note">
+          <font-awesome-icon icon="sticky-note"/>
+        </span>
+      </div>
       <Button
         @click.native.stop="addToWatchlist"
         v-tooltip.top="'Add to Watchlist'"
@@ -46,6 +51,9 @@ export default {
   computed: {
     isOnWatchlist() {
       return this.$store.getters["accounts/isOnWatchlist"](this.asset.id);
+    },
+    hasNote() {
+      return this.$store.getters["accounts/hasNote"](this.asset.id);
     }
   },
   methods: {
@@ -94,7 +102,7 @@ export default {
 .asset--meta {
   grid-area: price;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
 
   & > div {
     margin-right: spacing(4);
@@ -125,5 +133,11 @@ export default {
       margin-left: 15px;
     }
   }
+}
+
+.note {
+  align-self: center;
+  font-size: spacing(6);
+  margin-right: spacing(4);
 }
 </style>

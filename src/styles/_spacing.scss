@@ -1,17 +1,13 @@
-$spacing: (
-  1: 4px,
-  2: 8px,
-  3: 16px,
-  4: 20px,
-  5: 24px
-);
-
 @function spacing($space) {
-  @return map-get($spacing, $space);
+  @return 4px * $space;
 }
 
 .m-r-1 {
   margin-right: spacing(1);
+}
+
+.m-l-1 {
+  margin-left: spacing(1);
 }
 
 .m-t-2 {

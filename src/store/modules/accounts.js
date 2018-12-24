@@ -3,13 +3,19 @@ import ApiService from "@/services/api.service";
 const state = {
   signingUp: false,
   currentUser: null,
-  watchlist: []
+  watchlist: [],
+  notesList: [],
+  notes: {}
 };
 
 // getters
 const getters = {
   isOnWatchlist: state => id => {
     return state.watchlist.indexOf(id) >= 0;
+  },
+  hasNote: state => id => {
+    if (state.notesList.indexOf(id) >= 0) return state.notes[id];
+    return false;
   }
 };
 
@@ -72,6 +78,9 @@ const actions = {
   },
   async addToWatchlist({ commit }, asset) {
     commit("addToWatchlist", asset);
+  },
+  async addNote({ commit }, { asset, note }) {
+    commit("addNote", { asset, note });
   }
 };
 
@@ -94,6 +103,10 @@ const mutations = {
   },
   addToWatchlist(state, asset) {
     if (state.watchlist.indexOf(asset) === -1) state.watchlist.push(asset);
+  },
+  addNote(state, { asset, note }) {
+    if (state.notesList.indexOf(asset) === -1) state.notesList.push(asset);
+    state.notes[asset] = { note };
   }
 };
 

@@ -14,13 +14,14 @@ import {
   faTimes,
   faPlus,
   faSearch,
-  faEye
+  faEye,
+  faStickyNote
 } from "@fortawesome/free-solid-svg-icons";
 import VCalendar from "v-calendar";
 import "v-calendar/lib/v-calendar.min.css";
 import "@/styles/general.scss";
 
-library.add(faTimes, faPlus, faSearch, faEye);
+library.add(faTimes, faPlus, faSearch, faEye, faStickyNote);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
 Vue.use(VCalendar, {

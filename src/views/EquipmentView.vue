@@ -11,11 +11,22 @@
       <div class="asset--section top--section">
         <h2 class="text-align-center">{{ equipment.title }}</h2>
         <Button v-if="!isOnWatchlist" @click.native="addToWatchlist">
-          <font-awesome-icon icon="eye"/>Add To Watchlist
+          <font-awesome-icon icon="eye"/>
+          <span class="m-l-1">Add To Watchlist</span>
         </Button>
         <span v-else>
-          <font-awesome-icon icon="eye"/>Watching
+          <font-awesome-icon icon="eye"/>
+          <span class="m-l-1">Watching</span>
         </span>
+
+        <div v-if="editingNote">
+          <textarea v-model="assetNote"></textarea>
+          <Button @click.native="saveNote">Save</Button>
+        </div>
+        <div v-else>
+          {{ assetNote }}
+          <Button @click.native="startEditingNote">{{ hasNote ? 'Edit' : 'Add' }} Note</Button>
+        </div>
         <AssetBidding
           v-if="equipment.shoot_price"
           :shootPrice="equipment.shoot_price"
@@ -78,6 +89,9 @@ export default {
     },
     isOnWatchlist() {
       return this.$store.getters["accounts/isOnWatchlist"](this.equipment.id);
+    },
+    hasNote() {
+      return this.$store.getters["accounts/hasNote"](this.equipment.id);
     }
   },
   methods: {
@@ -89,6 +103,17 @@ export default {
     },
     addToWatchlist() {
       this.$store.dispatch("accounts/addToWatchlist", this.equipment.id);
+    },
+    startEditingNote() {
+      this.assetNote = this.hasNote ? this.hasNote : "";
+      this.editingNote = true;
+    },
+    saveNote() {
+      this.editingNote = false;
+      this.$store.dispatch("accounts/addNote", {
+        asset: this.equipment.id,
+        note: this.assetNote
+      });
     }
   },
   data: function() {
@@ -99,7 +124,9 @@ export default {
       errorCustomers: null,
       auction: {
         bidPrice: 10000
-      }
+      },
+      assetNote: null,
+      editingNote: false
     };
   }
 };
